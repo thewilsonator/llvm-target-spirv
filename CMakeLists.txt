@@ -7,7 +7,7 @@ if ( SPIRV_USE_LLVM_API )
   add_definitions(-D_SPIRV_LLVM_API)
 endif()
 
-add_llvm_library(LLVMSPIRVLib
+add_llvm_library(LLVMSpirv
   libSPIRV/SPIRVBasicBlock.cpp
   libSPIRV/SPIRVDebug.cpp
   libSPIRV/SPIRVDecorate.cpp
@@ -39,4 +39,4 @@ add_llvm_library(LLVMSPIRVLib
   TransOCLMD.cpp
   )
 
-add_dependencies(LLVMSPIRVLib intrinsics_gen)
+add_dependencies(LLVMSpirv intrinsics_gen)
