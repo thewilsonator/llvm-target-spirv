@@ -1208,7 +1208,7 @@ void OCL20ToSPIRV::transWorkItemBuiltinsToVariables() {
       Inst->dropAllReferences();
       Inst->removeFromParent();
     }
-    WorkList.push_back(I);
+    WorkList.push_back(&(*I));
   }
   for (auto &I:WorkList) {
     I->dropAllReferences();

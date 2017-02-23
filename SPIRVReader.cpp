@@ -58,7 +58,7 @@
 #include "llvm/IR/Module.h"
 #include "llvm/IR/Operator.h"
 #include "llvm/IR/Type.h"
-#include "llvm/PassManager.h"
+#include "llvm/IR/LegacyPassManager.h"
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/Dwarf.h"
@@ -188,11 +188,11 @@ public:
     if (!Enable)
       return;
     auto File = SpDbg.getEntryPointFileStr(ExecutionModelKernel, 0);
-    std::string BaseName;
-    std::string Path;
-    splitFileName(File, BaseName, Path);
+    //std::string BaseName;
+    //std::string Path;
+    //splitFileName(File, BaseName, Path);
     Builder.createCompileUnit(dwarf::DW_LANG_C99,
-      BaseName, Path, "spirv", false, "", 0, "", DIBuilder::LineTablesOnly);
+      getDIFile(File), "spirv", false, "", 0, "", DICompileUnit::DebugEmissionKind::LineTablesOnly);
   }
 
   void addDbgInfoVersion() {
@@ -204,7 +204,7 @@ public:
         DEBUG_METADATA_VERSION);
   }
 
-  DIFile getDIFile(const std::string &FileName){
+  DIFile *getDIFile(const std::string &FileName){
     return getOrInsert(FileMap, FileName, [=](){
       std::string BaseName;
       std::string Path;
@@ -212,20 +212,20 @@ public:
       if (!BaseName.empty())
         return Builder.createFile(BaseName, Path);
       else
-        return DIFile();
+        return (DIFile *)nullptr;
     });
   }
 
-  DISubprogram getDISubprogram(SPIRVFunction *SF, Function *F){
+  DISubprogram* getDISubprogram(SPIRVFunction *SF, Function *F){
     return getOrInsert(FuncMap, F, [=](){
       auto DF = getDIFile(SpDbg.getFunctionFileStr(SF));
       auto FN = F->getName();
       auto LN = SpDbg.getFunctionLineNo(SF);
-      Metadata *Args[] = {DIType()};
+      Metadata *Args[] = {nullptr};
       return Builder.createFunction(DF, FN, FN, DF, LN,
-        Builder.createSubroutineType(DF, Builder.getOrCreateTypeArray(Args)),
+        Builder.createSubroutineType(Builder.getOrCreateTypeArray({Args})),
         Function::isInternalLinkage(F->getLinkage()),
-        true, LN, 0, 0, NULL, NULL, NULL);
+        true, LN);
     });
   }
 
@@ -257,8 +257,8 @@ private:
   SPIRVDbgInfo SpDbg;
   DIBuilder Builder;
   bool Enable;
-  std::unordered_map<std::string, DIFile> FileMap;
-  std::unordered_map<Function *, DISubprogram> FuncMap;
+  std::unordered_map<std::string, DIFile*> FileMap;
+  std::unordered_map<Function *, DISubprogram*> FuncMap;
 
   void splitFileName(const std::string &FileName,
       std::string &BaseName,
@@ -528,11 +528,11 @@ SPIRVToLLVM::transOCLBuiltinsFromVariables(){
   std::vector<GlobalVariable *> WorkList;
   for (auto I = M->global_begin(), E = M->global_end(); I != E; ++I) {
     SPIRVBuiltinVariableKind Kind;
-    if (!isSPIRVBuiltinVariable(I, &Kind))
+    if (!isSPIRVBuiltinVariable(&*I, &Kind))
       continue;
-    if (!transOCLBuiltinFromVariable(I, Kind))
+    if (!transOCLBuiltinFromVariable(&*I, Kind))
       return false;
-    WorkList.push_back(I);
+    WorkList.push_back(&*I);
   }
   for (auto &I:WorkList) {
     I->dropAllReferences();
@@ -956,7 +956,7 @@ SPIRVToLLVM::postProcessOCL() {
       DEBUG(dbgs() << "[postProcessOCL sret] " << *F << '\n');
       if (F->getReturnType()->isStructTy() &&
           oclIsBuiltin(F->getName(), &DemangledName, isCPP)) {
-        if (!postProcessOCLBuiltinReturnStruct(F))
+        if (!postProcessOCLBuiltinReturnStruct(&*F))
           return false;
       }
     }
@@ -966,8 +966,8 @@ SPIRVToLLVM::postProcessOCL() {
     if (F->hasName() && F->isDeclaration()) {
       DEBUG(dbgs() << "[postProcessOCL func ptr] " << *F << '\n');
       auto AI = F->arg_begin();
-      if (hasFunctionPointerArg(F, AI) && isDecoratedSPIRVFunc(F))
-        if (!postProcessOCLBuiltinWithFuncPointer(F, AI))
+      if (hasFunctionPointerArg(&*F, AI) && isDecoratedSPIRVFunc(&*F))
+        if (!postProcessOCLBuiltinWithFuncPointer(&*F, AI))
           return false;
     }
   }
@@ -975,8 +975,8 @@ SPIRVToLLVM::postProcessOCL() {
     auto F = I++;
     if (F->hasName() && F->isDeclaration()) {
       DEBUG(dbgs() << "[postProcessOCL array arg] " << *F << '\n');
-      if (hasArrayArg(F) && oclIsBuiltin(F->getName(), &DemangledName, isCPP))
-        if (!postProcessOCLBuiltinWithArrayArguments(F, DemangledName))
+      if (hasArrayArg(&*F) && oclIsBuiltin(F->getName(), &DemangledName, isCPP))
+        if (!postProcessOCLBuiltinWithArrayArguments(&*F, DemangledName))
           return false;
     }
   }
@@ -1059,7 +1059,7 @@ SPIRVToLLVM::postProcessOCLBuiltinWithArrayArguments(Function* F,
       auto T = I->getType();
       if (!T->isArrayTy())
         continue;
-      auto Alloca = new AllocaInst(T, "", FBegin);
+      auto Alloca = new AllocaInst(T, "", &*FBegin);
       auto Store = new StoreInst(I, Alloca, false, CI);
       auto Zero = ConstantInt::getNullValue(Type::getInt32Ty(T->getContext()));
       Value *Index[] = {Zero, Zero};
@@ -1230,6 +1230,19 @@ SPIRVToLLVM::oclTransConstantSampler(SPIRV::SPIRVConstantSampler* BCS) {
   return ConstantInt::get(Ty, Lit);
 }
 
+const llvm::fltSemantics & fltSemOf(int width)
+{
+  switch (width) {
+    case 16:
+      return APFloat::IEEEhalf();
+    case 32:
+      return APFloat::IEEEsingle();
+    case 64:
+      return APFloat::IEEEdouble();
+    default:
+      llvm_unreachable("invalid float type");
+    }
+}
 /// For instructions, this function assumes they are created in order
 /// and appended to the given basic block. An instruction may use a
 /// instruction from another BB which has not been translated. Such
@@ -1259,21 +1272,8 @@ SPIRVToLLVM::transValueWithoutDecoration(SPIRVValue *BV, Function *F,
       return mapValue(BV, ConstantInt::get(LT, BConst->getZExtIntValue(),
           static_cast<SPIRVTypeInt*>(BT)->isSigned()));
     case OpTypeFloat: {
-      const llvm::fltSemantics *FS = nullptr;
-      switch (BT->getFloatBitWidth()) {
-      case 16:
-        FS = &APFloat::IEEEhalf;
-        break;
-      case 32:
-        FS = &APFloat::IEEEsingle;
-        break;
-      case 64:
-        FS = &APFloat::IEEEdouble;
-        break;
-      default:
-        llvm_unreachable("invalid float type");
-      }
-      return mapValue(BV, ConstantFP::get(*Context, APFloat(*FS,
+      const llvm::fltSemantics &FS = fltSemOf(BT->getFloatBitWidth());
+      return mapValue(BV, ConstantFP::get(*Context, APFloat(FS,
           APInt(BT->getFloatBitWidth(), BConst->getZExtIntValue()))));
     }
     default:
@@ -1349,7 +1349,8 @@ SPIRVToLLVM::transValueWithoutDecoration(SPIRVValue *BV, Function *F,
     auto LVar = new GlobalVariable(*M, Ty, IsConst, LinkageTy, Initializer,
         BV->getName(), 0, GlobalVariable::NotThreadLocal, AddrSpace);
     LVar->setUnnamedAddr(IsConst && Ty->isArrayTy() &&
-        Ty->getArrayElementType()->isIntegerTy(8));
+                         Ty->getArrayElementType()->isIntegerTy(8) ? GlobalValue::UnnamedAddr::Global
+                                                                   : GlobalValue::UnnamedAddr::None);
     SPIRVBuiltinVariableKind BVKind;
     if (BVar->isBuiltin(&BVKind))
       BuiltinGVMap[LVar] = BVKind;
@@ -1363,7 +1364,7 @@ SPIRVToLLVM::transValueWithoutDecoration(SPIRVValue *BV, Function *F,
     for (Function::arg_iterator I = F->arg_begin(), E = F->arg_end(); I != E;
         ++I, ++ArgNo) {
       if (ArgNo == BA->getArgNo())
-        return mapValue(BV, I);
+        return mapValue(BV, &*I);
     }
     llvm_unreachable("Invalid argument");
     return nullptr;
@@ -1536,11 +1537,12 @@ SPIRVToLLVM::transValueWithoutDecoration(SPIRVValue *BV, Function *F,
     auto IsInbound = AC->isInBounds();
     Value *V = nullptr;
     if (BB) {
-      auto GEP = GetElementPtrInst::Create(Base, Index, BV->getName(), BB);
+      auto GEP = GetElementPtrInst::Create(Base->getType(),Base, Index, BV->getName(), BB);
       GEP->setIsInBounds(IsInbound);
       V = GEP;
     } else {
-      V = ConstantExpr::getGetElementPtr(dyn_cast<Constant>(Base), Index,
+      auto c = dyn_cast<Constant>(Base);
+      V = ConstantExpr::getGetElementPtr(c->getType(), c, Index,
                                          IsInbound);
     }
     return mapValue(BV, V);
@@ -1726,8 +1728,8 @@ SPIRVToLLVM::transFunction(SPIRVFunction *BF) {
   for (Function::arg_iterator I = F->arg_begin(), E = F->arg_end(); I != E;
       ++I) {
     auto BA = BF->getArgument(I->getArgNo());
-    mapValue(BA, I);
-    setName(I, BA);
+    mapValue(BA, &*I);
+    setName(&*I, BA);
     BA->foreachAttr([&](SPIRVFuncParamAttrKind Kind){
       if (Kind == FunctionParameterAttributeNoWrite)
         return;
@@ -2496,7 +2498,7 @@ llvm::ReadSPIRV(LLVMContext &C, std::istream &IS, Module *&M,
     BM->getError(ErrMsg);
     Succeed = false;
   }
-  PassManager PassMgr;
+  legacy::PassManager PassMgr;
   PassMgr.add(createSPIRVToOCL20());
   PassMgr.add(createOCL20To12());
   PassMgr.run(*M);

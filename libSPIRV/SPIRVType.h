@@ -301,7 +301,7 @@ public:
   SPIRVType *getElementType() const { return ElemType;}
   SPIRVConstant *getLength() const;
   SPIRVCapVec getRequiredCapability() const {
-    return std::move(getElementType()->getRequiredCapability());
+    return getElementType()->getRequiredCapability();
   }
   virtual std::vector<SPIRVEntry*> getNonLiteralOperands() const {
     std::vector<SPIRVEntry*> Operands(2, ElemType);

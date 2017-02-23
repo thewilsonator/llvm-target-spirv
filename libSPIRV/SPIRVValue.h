@@ -113,8 +113,8 @@ public:
   SPIRVCapVec getRequiredCapability() const {
     SPIRVCapVec CV;
     if (!hasType())
-      return std::move(CV);
-    return std::move(Type->getRequiredCapability());
+      return CV;
+    return Type->getRequiredCapability();
   }
 
 protected:

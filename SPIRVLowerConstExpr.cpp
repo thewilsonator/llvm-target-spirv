@@ -120,7 +120,7 @@ SPIRVLowerConstExpr::visit(Module *M) {
       auto FBegin = I->begin();
       for (auto BI = FBegin, BE = I->end(); BI != BE; ++BI) {
         for (auto II = BI->begin(), IE = BI->end(); II != IE; ++II) {
-          WorkList.push_back(II);
+          WorkList.push_back(&*II);
         }
       }
       while (!WorkList.empty()) {
@@ -132,7 +132,7 @@ SPIRVLowerConstExpr::visit(Module *M) {
           if (auto CE = dyn_cast<ConstantExpr>(Op)) {
             SPIRVDBG(dbgs() << "[lowerConstantExpressions] " << *CE;)
             auto ReplInst = CE->getAsInstruction();
-            ReplInst->insertBefore(FBegin->begin());
+            ReplInst->insertBefore(&*FBegin->begin());
             SPIRVDBG(dbgs() << " -> " << *ReplInst << '\n';)
             WorkList.push_front(ReplInst);
             std::vector<Instruction *> Users;
@@ -141,7 +141,7 @@ SPIRVLowerConstExpr::visit(Module *M) {
               SPIRVDBG(dbgs() << "[lowerConstantExpressions] Use: " <<
                   *U << '\n';)
               if (auto InstUser = dyn_cast<Instruction>(U)) {
-                if (InstUser->getParent()->getParent() != I)
+                if (InstUser->getParent()->getParent() != &*I)
                   continue;
                 Users.push_back(InstUser);
               }

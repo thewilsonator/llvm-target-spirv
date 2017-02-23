@@ -51,7 +51,9 @@
 #include "llvm/Analysis/AssumptionCache.h"
 #include "llvm/Analysis/CallGraph.h"
 #include "llvm/IR/Verifier.h"
-#include "llvm/Bitcode/ReaderWriter.h"
+#include "llvm/Bitcode/BitcodeWriter.h"
+#include "llvm/Bitcode/BitcodeReader.h"
+#include "llvm/InitializePasses.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/Function.h"
@@ -103,7 +105,7 @@ public:
 
   virtual void getAnalysisUsage(AnalysisUsage &AU) const {
     AU.addRequired<CallGraphWrapperPass>();
-    AU.addRequired<AliasAnalysis>();
+    //AU.addRequired<AliasAnalysis>();
     AU.addRequired<AssumptionCacheTracker>();
   }
 
@@ -144,7 +146,7 @@ private:
   eraseUselessFunctions() {
     bool changed = false;
     for (auto I = M->begin(), E = M->end(); I != E;) {
-      Function *F = I++;
+      Function *F = &*I++;
       if (!GlobalValue::isInternalLinkage(F->getLinkage()) &&
           !F->isDeclaration())
         continue;
@@ -340,8 +342,11 @@ private:
       DEBUG(dbgs() << "[lowerReturnBlock] inline " << F->getName() << '\n');
       auto CG = &getAnalysis<CallGraphWrapperPass>().getCallGraph();
       auto ACT = &getAnalysis<AssumptionCacheTracker>();
-      auto AA = &getAnalysis<AliasAnalysis>();
-      InlineFunctionInfo IFI(CG, M->getDataLayout(), AA, ACT);
+      //auto AA = &getAnalysis<AliasAnalysis>();
+      //InlineFunctionInfo IFI(CG, M->getDataLayout(), AA, ACT);
+    std::function<AssumptionCache &(Function &)> actf=
+        [&ACT](Function& f) -> AssumptionCache & {return ACT->getAssumptionCache(f);};
+      InlineFunctionInfo IFI(CG,&actf);
       InlineFunction(CI, IFI);
       Inlined = true;
     }
@@ -460,7 +465,7 @@ INITIALIZE_PASS_BEGIN(SPIRVLowerOCLBlocks, "spvblocks",
     "SPIR-V lower OCL blocks", false, false)
 INITIALIZE_PASS_DEPENDENCY(CallGraphWrapperPass)
 INITIALIZE_PASS_DEPENDENCY(AssumptionCacheTracker)
-INITIALIZE_AG_DEPENDENCY(AliasAnalysis)
+initializeAnalysis(Registry);
 INITIALIZE_PASS_END(SPIRVLowerOCLBlocks, "spvblocks",
     "SPIR-V lower OCL blocks", false, false)
 

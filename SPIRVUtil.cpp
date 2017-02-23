@@ -45,7 +45,8 @@
 #include "OCLUtil.h"
 
 #include "llvm/ADT/StringSwitch.h"
-#include "llvm/Bitcode/ReaderWriter.h"
+#include "llvm/Bitcode/BitcodeWriter.h"
+#include "llvm/Bitcode/BitcodeReader.h"
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/Debug.h"
@@ -82,8 +83,7 @@ addFnAttr(LLVMContext *Context, CallInst *Call, Attribute::AttrKind Attr) {
 
 void
 removeFnAttr(LLVMContext *Context, CallInst *Call, Attribute::AttrKind Attr) {
-  Call->removeAttribute(AttributeSet::FunctionIndex,
-      Attribute::get(*Context, Attr));
+  Call->removeAttribute(AttributeSet::FunctionIndex, Attr);
 }
 
 Value *
@@ -814,7 +814,7 @@ addBlockBind(Module *M, Function *InvokeFunc, Value *BlkCtx, Value *CtxLen,
 
 IntegerType* getSizetType(Module *M) {
   return IntegerType::getIntNTy(M->getContext(),
-    M->getDataLayout()->getPointerSizeInBits(0));
+    M->getDataLayout().getPointerSizeInBits(0));
 }
 
 Type *
@@ -1031,7 +1031,7 @@ transTypeDesc(Type *Ty, const BuiltinArgTypeMangleInfo &Info) {
     if (Name.empty()) {
       std::ostringstream OS;
       OS << reinterpret_cast<size_t>(Ty);
-      Name = std::string("struct_") + OS.str();
+      Name = (std::string("struct_") + OS.str()).c_str();
     }
     return SPIR::RefParamType(new SPIR::UserDefinedType(Name));
   }
@@ -1343,7 +1343,7 @@ bool
 eraseUselessFunctions(Module *M) {
   bool changed = false;
   for (auto I = M->begin(), E = M->end(); I != E;)
-    changed |= eraseIfNoUse(I++);
+    changed |= eraseIfNoUse(&*I++);
   return changed;
 }
 
