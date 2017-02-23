@@ -145,7 +145,7 @@ public:
       CV.push_back(CapabilityInt16);
     else if (isTypeInt(64))
       CV.push_back(CapabilityInt64);
-    return std::move(CV);
+    return CV;
   }
 
 protected:
@@ -176,7 +176,7 @@ public:
       CV.push_back(CapabilityFloat16);
     else if (isTypeFloat(64))
       CV.push_back(CapabilityFloat64);
-    return std::move(CV);
+    return CV;
   }
 
 
