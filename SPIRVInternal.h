@@ -44,7 +44,7 @@
 #include "libSPIRV/SPIRVNameMapEnum.h"
 #include "libSPIRV/SPIRVError.h"
 #include "libSPIRV/SPIRVType.h"
-#include "NameMangleAPI.h"
+#include "Mangler/NameMangleAPI.h"
 
 #include "llvm/IR/Attributes.h"
 #include "llvm/IR/Constants.h"

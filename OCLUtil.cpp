@@ -39,9 +39,9 @@
 
 #include "SPIRVInternal.h"
 #include "OCLUtil.h"
-#include "SPIRVEntry.h"
-#include "SPIRVFunction.h"
-#include "SPIRVInstruction.h"
+#include "libSPIRV/SPIRVEntry.h"
+#include "libSPIRV/SPIRVFunction.h"
+#include "libSPIRV/SPIRVInstruction.h"
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/IR/InstVisitor.h"
 #include "llvm/IR/Instructions.h"

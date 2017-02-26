@@ -1,4 +1,4 @@
-﻿//===- SPIRVReader.cpp - Converts SPIR-V to LLVM ----------------*- C++ -*-===//
+//===- SPIRVReader.cpp - Converts SPIR-V to LLVM ----------------*- C++ -*-===//
 //
 //                     The LLVM/SPIR-V Translator
 //
@@ -36,14 +36,14 @@
 /// This file implements conversion of SPIR-V binary to LLVM IR.
 ///
 //===----------------------------------------------------------------------===//
-#include "SPIRVUtil.h"
-#include "SPIRVType.h"
-#include "SPIRVValue.h"
-#include "SPIRVModule.h"
-#include "SPIRVFunction.h"
-#include "SPIRVBasicBlock.h"
-#include "SPIRVInstruction.h"
-#include "SPIRVExtInst.h"
+#include "libSPIRV/SPIRVUtil.h"
+#include "libSPIRV/SPIRVType.h"
+#include "libSPIRV/SPIRVValue.h"
+#include "libSPIRV/SPIRVModule.h"
+#include "libSPIRV/SPIRVFunction.h"
+#include "libSPIRV/SPIRVBasicBlock.h"
+#include "libSPIRV/SPIRVInstruction.h"
+#include "libSPIRV/SPIRVExtInst.h"
 #include "SPIRVInternal.h"
 #include "SPIRVMDBuilder.h"
 #include "OCLUtil.h"
