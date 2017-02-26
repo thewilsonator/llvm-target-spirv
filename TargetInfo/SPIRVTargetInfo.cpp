@@ -1,4 +1,4 @@
-//===-- RISCVTargetInfo.cpp - RISCV Target Implementation -----------------===//
+//===-- SPIRVTargetInfo.cpp - SPIRV Target Implementation -----------------===//
 //
 //                     The LLVM Compiler Infrastructure
 //

@@ -1,4 +1,4 @@
-//===-- SparcTargetMachine.h - Define TargetMachine for Sparc ---*- C++ -*-===//
+//===-- SPIRVTargetMachine.h - Define TargetMachine for SPIRV ---*- C++ -*-===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -7,7 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file declares the Sparc specific subclass of TargetMachine.
+// This file declares the SPIRV specific subclass of TargetMachine.
 //
 //===----------------------------------------------------------------------===//
 

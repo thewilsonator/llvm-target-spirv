@@ -1,4 +1,4 @@
-//===-- RISCVMCTargetDesc.cpp - RISCV Target Descriptions -----------------===//
+//===-- SPIRVMCTargetDesc.cpp - RISCV Target Descriptions -----------------===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -31,5 +31,5 @@ using namespace llvm;
 
 */
 extern "C" void LLVMInitializeSPIRVTargetMC() {
-
+  //We do not support Jitting
 }
