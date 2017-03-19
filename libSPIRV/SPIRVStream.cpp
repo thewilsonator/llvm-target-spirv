@@ -153,6 +153,7 @@ operator>>(const SPIRVDecoder&I, std::string& Str) {
   }
 #endif
 
+  I.IS >> std::noskipws;
   uint64_t Count = 0;
   char Ch;
   while (I.IS >> Ch && Ch != '\0') {
