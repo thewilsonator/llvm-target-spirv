@@ -133,7 +133,8 @@ public:
   void setSPIRVModule(SPIRVModule *SMod) { BM = SMod;}
 
   void transDbgInfo(Value *V, SPIRVValue *BV) {
-    if (auto I = dyn_cast<Instruction>(V)) {
+    //TODO: make this work
+    /*if (auto I = dyn_cast<Instruction>(V)) {
       auto DL = I->getDebugLoc();
       if (!DL) {
         //DILocation DIL(*DL.get());
@@ -149,7 +150,7 @@ public:
         auto File = BM->getString(DIS->getFilename().str());
         BM->addLine(BV, File, DIS->getLine(), 0);
       }
-    }
+    }*/
   }
 
 private:
