@@ -439,7 +439,7 @@ public:
     assert(F && "lack of necessary information");
     // handle [read|write]pipe builtins (plus two i32 literal args
     // required by SPIR 2.0 provisional specification):
-    if (F->getArgumentList().size() == 6) {
+    if ((F->arg_end()) - (F->arg_begin()) == 6) {
       // with 4 arguments (plus two i32 literals):
       // int read_pipe (read_only pipe gentype p, reserve_id_t reserve_id, uint index, gentype *ptr)
       // int write_pipe (write_only pipe gentype p, reserve_id_t reserve_id, uint index, const gentype *ptr)
@@ -447,7 +447,7 @@ public:
       addVoidPtrArg(3);
       addUnsignedArg(4);
       addUnsignedArg(5);
-    } else if (F->getArgumentList().size() == 4) {
+    } else if ((F->arg_end()) - (F->arg_begin()) == 4) {
       // with 2 arguments (plus two i32 literals):
       // int read_pipe (read_only pipe gentype p, gentype *ptr)
       // int write_pipe (write_only pipe gentype p, const gentype *ptr)
