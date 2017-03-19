@@ -1,4 +1,4 @@
-//===-- SPIRCTargetMachine.cpp - Define TargetMachine for SPIRV -----------===//
+//===-- SPIRVTargetMachine.cpp - Define TargetMachine for SPIRV -----------===//
 //
 //                     The LLVM Compiler Infrastructure
 //
