@@ -90,6 +90,7 @@ public:
     Ty2 Val;
     bool Found = find(Key, &Val);
     assert (Found && "Invalid key");
+    (void)Found; //Supress warning spam
     return Val;
   }
 
@@ -97,6 +98,7 @@ public:
     Ty1 Val;
     bool Found = rfind(Key, &Val);
     assert (Found && "Invalid key");
+    (void)Found; //Supress warning spam
     return Val;
   }
 

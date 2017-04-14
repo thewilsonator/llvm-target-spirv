@@ -52,10 +52,11 @@
 using namespace spv;
 
 namespace SPIRV{
-
+#ifdef SPIRV_VALIDATE_ENUMS
 inline bool
 isValid(spv::SourceLanguage V) {
   switch(V) {
+
     case SourceLanguageUnknown:
     case SourceLanguageESSL:
     case SourceLanguageGLSL:
@@ -870,7 +871,32 @@ isValid(spv::Op V) {
       return false;
   }
 }
-
+#else /*SPIRV_VALIDATE_ENUMS*/
+#define VALIDATE(T) inline bool isValid(spv::T V) { return true; }
+    VALIDATE(SourceLanguage)
+    VALIDATE(ExecutionModel)
+    VALIDATE(AddressingModel)
+    VALIDATE(MemoryModel)
+    VALIDATE(ExecutionMode)
+    VALIDATE(StorageClass)
+    VALIDATE(Dim)
+    VALIDATE(SamplerAddressingMode)
+    VALIDATE(SamplerFilterMode)
+    VALIDATE(ImageFormat)
+    VALIDATE(ImageChannelOrder)
+    VALIDATE(ImageChannelDataType)
+    VALIDATE(FPRoundingMode)
+    VALIDATE(LinkageType)
+    VALIDATE(AccessQualifier)
+    VALIDATE(FunctionParameterAttribute)
+    VALIDATE(Decoration)
+    VALIDATE(BuiltIn)
+    VALIDATE(Scope)
+    VALIDATE(GroupOperation)
+    VALIDATE(KernelEnqueueFlags)
+    VALIDATE(Capability)
+    VALIDATE(Op)
+#endif
 inline bool
 isValidImageOperandsMask(SPIRVWord Mask) {
   SPIRVWord ValidMask = 0u;
@@ -960,6 +986,8 @@ isValidKernelProfilingInfoMask(SPIRVWord Mask) {
   ValidMask |= KernelProfilingInfoCmdExecTimeMask;
 
   return (Mask & ~ValidMask) == 0;
+
+
 }
 
 } /* namespace SPIRV */

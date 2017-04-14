@@ -161,7 +161,7 @@ OCL21ToSPIRV::visitCallInst(CallInst& CI) {
 
 void OCL21ToSPIRV::visitCallConvert(CallInst* CI,
     StringRef MangledName, Op OC) {
-  AttributeSet Attrs = CI->getCalledFunction()->getAttributes();
+  auto Attrs = CI->getCalledFunction()->getAttributes();
   mutateCallInstSPIRV(M, CI, [=](CallInst *, std::vector<Value *> &Args){
     Args.pop_back();
     return getSPIRVFuncName(OC, kSPIRVPostfix::Divider +
@@ -190,7 +190,7 @@ void OCL21ToSPIRV::visitCallDecorate(CallInst* CI,
 
 void
 OCL21ToSPIRV::transBuiltin(CallInst* CI, Op OC) {
-  AttributeSet Attrs = CI->getCalledFunction()->getAttributes();
+  auto Attrs = CI->getCalledFunction()->getAttributes();
   assert(OC != OpExtInst && "not supported");
   mutateCallInstSPIRV(M, CI, [=](CallInst *, std::vector<Value *> &Args){
     return getSPIRVFuncName(OC);

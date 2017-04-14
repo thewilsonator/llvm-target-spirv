@@ -1,4 +1,4 @@
-//===-- SPIRVTargetMachine.cpp - Define TargetMachine for SPIRV -----------===//
+//===-- SPIRCTargetMachine.cpp - Define TargetMachine for SPIRV -----------===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -40,6 +40,8 @@ bool SPIRVTargetMachine::addPassesToEmitFile(PassManagerBase &PM,
                          MachineFunctionInitializer *MFInitializer)
 {
     PM.add(createSPIRVWriterPass(Out));
+    return false;
+    
 }
 
 SPIRV32TargetMachine::SPIRV32TargetMachine(const Target &T, const Triple &TT,

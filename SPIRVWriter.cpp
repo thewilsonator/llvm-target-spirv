@@ -133,8 +133,9 @@ public:
   void setSPIRVModule(SPIRVModule *SMod) { BM = SMod;}
 
   void transDbgInfo(Value *V, SPIRVValue *BV) {
-    //TODO: make this work
-    /*if (auto I = dyn_cast<Instruction>(V)) {
+    // TODO: make this work
+    /*
+    if (auto I = dyn_cast<Instruction>(V)) {
       auto DL = I->getDebugLoc();
       if (!DL) {
         //DILocation DIL(*DL.get());
@@ -150,7 +151,8 @@ public:
         auto File = BM->getString(DIS->getFilename().str());
         BM->addLine(BV, File, DIS->getLine(), 0);
       }
-    }*/
+    }
+    */
   }
 
 private:
@@ -180,7 +182,7 @@ public:
     return true;
   }
 
-  void getAnalysisUsage(AnalysisUsage &AU) const {
+  void getAnalysisUsage(AnalysisUsage &AU) const override {
     AU.addRequired<OCLTypeToSPIRV>();
   }
 
@@ -656,9 +658,9 @@ LLVMToSPIRV::transFunctionDecl(Function *F) {
     if (Attrs.hasAttribute(ArgNo + 1, Attribute::SExt))
       BA->addAttr(FunctionParameterAttributeSext);
   }
-  if (Attrs.hasAttribute(AttributeSet::ReturnIndex, Attribute::ZExt))
+  if (Attrs.hasAttribute(AttributeList::ReturnIndex, Attribute::ZExt))
     BF->addDecorate(DecorationFuncParamAttr, FunctionParameterAttributeZext);
-  if (Attrs.hasAttribute(AttributeSet::ReturnIndex, Attribute::SExt))
+  if (Attrs.hasAttribute(AttributeList::ReturnIndex, Attribute::SExt))
     BF->addDecorate(DecorationFuncParamAttr, FunctionParameterAttributeSext);
   DbgTran.transDbgInfo(F, BF);
   SPIRVDBG(dbgs() << "[transFunction] " << *F << " => ";
@@ -951,8 +953,8 @@ LLVMToSPIRV::transValueWithoutDecoration(Value *V, SPIRVBasicBlock *BB,
   if (auto *Switch = dyn_cast<SwitchInst>(V)) {
     std::vector<std::pair<SPIRVWord, SPIRVBasicBlock *>> Pairs;
     for (auto I = Switch->case_begin(), E = Switch->case_end(); I != E; ++I)
-      Pairs.push_back(std::make_pair(I.getCaseValue()->getZExtValue(),
-          static_cast<SPIRVBasicBlock*>(transValue(I.getCaseSuccessor(),
+      Pairs.push_back(std::make_pair(I->getCaseValue()->getZExtValue(),
+          static_cast<SPIRVBasicBlock*>(transValue(I->getCaseSuccessor(),
               nullptr))));
     return mapValue(V, BM->addSwitchInst(
         transValue(Switch->getCondition(), BB),
@@ -1052,11 +1054,12 @@ bool
 LLVMToSPIRV::transDecoration(Value *V, SPIRVValue *BV) {
   if (!transAlign(V, BV))
     return false;
-  if ((isa<AtomicCmpXchgInst>(V) &&
+  //TODO: make this work
+  /*if ((isa<AtomicCmpXchgInst>(V) &&
       cast<AtomicCmpXchgInst>(V)->isVolatile()) ||
       (isa<AtomicRMWInst>(V) && cast<AtomicRMWInst>(V)->isVolatile()))
     BV->setVolatile(true);
-  DbgTran.transDbgInfo(V, BV);
+  DbgTran.transDbgInfo(V, BV);*/
   return true;
 }
 

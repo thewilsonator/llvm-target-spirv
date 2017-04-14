@@ -268,7 +268,7 @@ public:
     SPIRVCapVec V(getComponentType()->getRequiredCapability());
     if (CompCount >= 8)
       V.push_back(CapabilityVector16);
-    return std::move(V);
+    return V;
   }
 
   virtual std::vector<SPIRVEntry*> getNonLiteralOperands() const {

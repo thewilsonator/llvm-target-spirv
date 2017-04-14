@@ -104,7 +104,7 @@ const char* kPlaceholderPrefix = "placeholder.";
 static bool DbgSaveTmpLLVM = true;
 static const char *DbgTmpLLVMFileName = "_tmp_llvmbil.ll";
 
-typedef std::pair < unsigned, AttributeSet > AttributeWithIndex;
+typedef std::pair < unsigned, AttributeList > AttributeWithIndex;
 
 static bool
 isOpenCLKernel(SPIRVFunction *BF) {
@@ -629,7 +629,7 @@ SPIRVToLLVM::transOCLImageTypeName(SPIRV::SPIRVTypeImage* ST) {
   if (SPIRVGenImgTypeAccQualPostfix)
     Name = Name + kSPR2TypeName::Delimiter
       + rmap<std::string>(ST->getAccessQualifier());
-  return std::move(Name);
+  return Name;
 }
 
 std::string
@@ -1059,8 +1059,9 @@ SPIRVToLLVM::postProcessOCLBuiltinWithArrayArguments(Function* F,
       auto T = I->getType();
       if (!T->isArrayTy())
         continue;
-      auto Alloca = new AllocaInst(T, "", &*FBegin);
+      auto Alloca = new AllocaInst(T,0, "", &*FBegin);
       auto Store = new StoreInst(I, Alloca, false, CI);
+      (void)Store;
       auto Zero = ConstantInt::getNullValue(Type::getInt32Ty(T->getContext()));
       Value *Index[] = {Zero, Zero};
       I = GetElementPtrInst::CreateInBounds(Alloca, Index, "", CI);
@@ -1074,7 +1075,7 @@ SPIRVToLLVM::postProcessOCLBuiltinWithArrayArguments(Function* F,
 Instruction *
 SPIRVToLLVM::postProcessOCLReadImage(SPIRVInstruction *BI, CallInst* CI,
     const std::string &FuncName) {
-  AttributeSet Attrs = CI->getCalledFunction()->getAttributes();
+  auto Attrs = CI->getCalledFunction()->getAttributes();
   StringRef ImageTypeName;
   bool isDepthImage = false;
   if (isOCLImageType(
@@ -1126,7 +1127,7 @@ SPIRVToLLVM::postProcessOCLReadImage(SPIRVInstruction *BI, CallInst* CI,
 CallInst*
 SPIRVToLLVM::postProcessOCLWriteImage(SPIRVInstruction *BI, CallInst *CI,
                                       const std::string &DemangledName) {
-  AttributeSet Attrs = CI->getCalledFunction()->getAttributes();
+  auto Attrs = CI->getCalledFunction()->getAttributes();
   return mutateCallInstOCL(M, CI, [=](CallInst *, std::vector<Value *> &Args) {
     llvm::Type *T = Args[2]->getType();
     if (Args.size() > 4) {
@@ -1162,7 +1163,7 @@ SPIRVToLLVM::postProcessOCLBuildNDRange(SPIRVInstruction *BI, CallInst *CI,
 Instruction *
 SPIRVToLLVM::postProcessGroupAllAny(CallInst *CI,
                                     const std::string &DemangledName) {
-  AttributeSet Attrs = CI->getCalledFunction()->getAttributes();
+  auto Attrs = CI->getCalledFunction()->getAttributes();
   return mutateCallInstSPIRV(
       M, CI,
       [=](CallInst *, std::vector<Value *> &Args, llvm::Type *&RetTy) {
@@ -1182,7 +1183,7 @@ SPIRVToLLVM::postProcessGroupAllAny(CallInst *CI,
 CallInst *
 SPIRVToLLVM::expandOCLBuiltinWithScalarArg(CallInst* CI,
     const std::string &FuncName) {
-  AttributeSet Attrs = CI->getCalledFunction()->getAttributes();
+  auto Attrs = CI->getCalledFunction()->getAttributes();
   if (!CI->getOperand(0)->getType()->isVectorTy() &&
     CI->getOperand(1)->getType()->isVectorTy()) {
     return mutateCallInstOCL(M, CI, [=](CallInst *, std::vector<Value *> &Args){
@@ -1343,7 +1344,7 @@ SPIRVToLLVM::transValueWithoutDecoration(SPIRVValue *BV, Function *F,
     SPIRVStorageClassKind BS = BVar->getStorageClass();
     if (BS == StorageClassFunction && !Init) {
         assert (BB && "Invalid BB");
-        return mapValue(BV, new AllocaInst(Ty, BV->getName(), BB));
+        return mapValue(BV, new AllocaInst(Ty, 0,BV->getName(), BB));
     }
     auto AddrSpace = SPIRSPIRVAddrSpaceMap::rmap(BS);
     auto LVar = new GlobalVariable(*M, Ty, IsConst, LinkageTy, Initializer,
@@ -1739,7 +1740,7 @@ SPIRVToLLVM::transFunction(SPIRVFunction *BF) {
   BF->foreachReturnValueAttr([&](SPIRVFuncParamAttrKind Kind){
     if (Kind == FunctionParameterAttributeNoWrite)
       return;
-    F->addAttribute(AttributeSet::ReturnIndex,
+    F->addAttribute(AttributeList::ReturnIndex,
         SPIRSPIRVFuncParamAttrMap::rmap(Kind));
   });
 
@@ -2425,7 +2426,7 @@ SPIRVToLLVM::transLinkageType(const SPIRVValue* V) {
 
 Instruction *SPIRVToLLVM::transOCLAllAny(SPIRVInstruction *I, BasicBlock *BB) {
   CallInst *CI = cast<CallInst>(transSPIRVBuiltinFromInst(I, BB));
-  AttributeSet Attrs = CI->getCalledFunction()->getAttributes();
+  auto Attrs = CI->getCalledFunction()->getAttributes();
   return cast<Instruction>(mapValue(
       I, mutateCallInstOCL(
              M, CI,
@@ -2449,7 +2450,7 @@ Instruction *SPIRVToLLVM::transOCLAllAny(SPIRVInstruction *I, BasicBlock *BB) {
 
 Instruction *SPIRVToLLVM::transOCLRelational(SPIRVInstruction *I, BasicBlock *BB) {
   CallInst *CI = cast<CallInst>(transSPIRVBuiltinFromInst(I, BB));
-  AttributeSet Attrs = CI->getCalledFunction()->getAttributes();
+  auto Attrs = CI->getCalledFunction()->getAttributes();
   return cast<Instruction>(mapValue(
       I, mutateCallInstOCL(
              M, CI,

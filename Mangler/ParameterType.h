@@ -441,6 +441,7 @@ namespace SPIR {
     virtual MangleError visit(const AtomicType*)      = 0;
     virtual MangleError visit(const BlockType*)       = 0;
     virtual MangleError visit(const UserDefinedType*) = 0;
+    virtual ~TypeVisitor() = default;
   };
 
   /// @brief Template dynamic cast function for ParamType derived classes.

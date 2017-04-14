@@ -78,12 +78,12 @@ EnableDbgOutput("spirv-debug",
 
 void
 addFnAttr(LLVMContext *Context, CallInst *Call, Attribute::AttrKind Attr) {
-  Call->addAttribute(AttributeSet::FunctionIndex, Attr);
+  Call->addAttribute(AttributeList::FunctionIndex, Attr);
 }
 
 void
 removeFnAttr(LLVMContext *Context, CallInst *Call, Attribute::AttrKind Attr) {
-  Call->removeAttribute(AttributeSet::FunctionIndex, Attr);
+  Call->removeAttribute(AttributeList::FunctionIndex, Attr);
 }
 
 Value *
@@ -291,7 +291,7 @@ isSPIRVType(llvm::Type* Ty, StringRef BaseTyName, StringRef *Postfix) {
 
 Function *
 getOrCreateFunction(Module *M, Type *RetTy, ArrayRef<Type *> ArgTypes,
-    StringRef Name, BuiltinFuncMangleInfo *Mangle, AttributeSet *Attrs,
+    StringRef Name, BuiltinFuncMangleInfo *Mangle, AttributeList *Attrs,
     bool takeName) {
   std::string MangledName = Name;
   bool isVarArg = false;
@@ -634,7 +634,7 @@ hasArrayArg(Function *F) {
 CallInst *
 mutateCallInst(Module *M, CallInst *CI,
     std::function<std::string (CallInst *, std::vector<Value *> &)>ArgMutate,
-    BuiltinFuncMangleInfo *Mangle, AttributeSet *Attrs, bool TakeFuncName) {
+    BuiltinFuncMangleInfo *Mangle, AttributeList *Attrs, bool TakeFuncName) {
   DEBUG(dbgs() << "[mutateCallInst] " << *CI);
 
   auto Args = getArguments(CI);
@@ -658,7 +658,7 @@ mutateCallInst(Module *M, CallInst *CI,
     std::function<std::string (CallInst *, std::vector<Value *> &,
         Type *&RetTy)>ArgMutate,
     std::function<Instruction *(CallInst *)> RetMutate,
-    BuiltinFuncMangleInfo *Mangle, AttributeSet *Attrs, bool TakeFuncName) {
+    BuiltinFuncMangleInfo *Mangle, AttributeList *Attrs, bool TakeFuncName) {
   DEBUG(dbgs() << "[mutateCallInst] " << *CI);
 
   auto Args = getArguments(CI);
@@ -683,7 +683,7 @@ mutateCallInst(Module *M, CallInst *CI,
 void
 mutateFunction(Function *F,
     std::function<std::string (CallInst *, std::vector<Value *> &)>ArgMutate,
-    BuiltinFuncMangleInfo *Mangle, AttributeSet *Attrs,
+    BuiltinFuncMangleInfo *Mangle, AttributeList *Attrs,
     bool TakeFuncName) {
   auto M = F->getParent();
   for (auto I = F->user_begin(), E = F->user_end(); I != E;) {
@@ -697,7 +697,7 @@ mutateFunction(Function *F,
 CallInst *
 mutateCallInstSPIRV(Module *M, CallInst *CI,
     std::function<std::string (CallInst *, std::vector<Value *> &)>ArgMutate,
-    AttributeSet *Attrs) {
+    AttributeList *Attrs) {
   BuiltinFuncMangleInfo BtnInfo;
   return mutateCallInst(M, CI, ArgMutate, &BtnInfo, Attrs);
 }
@@ -707,14 +707,14 @@ mutateCallInstSPIRV(Module *M, CallInst *CI,
     std::function<std::string (CallInst *, std::vector<Value *> &,
         Type *&RetTy)> ArgMutate,
     std::function<Instruction *(CallInst *)> RetMutate,
-    AttributeSet *Attrs) {
+    AttributeList *Attrs) {
   BuiltinFuncMangleInfo BtnInfo;
   return mutateCallInst(M, CI, ArgMutate, RetMutate, &BtnInfo, Attrs);
 }
 
 CallInst *
 addCallInst(Module *M, StringRef FuncName, Type *RetTy, ArrayRef<Value *> Args,
-    AttributeSet *Attrs, Instruction *Pos, BuiltinFuncMangleInfo *Mangle,
+    AttributeList *Attrs, Instruction *Pos, BuiltinFuncMangleInfo *Mangle,
     StringRef InstName, bool TakeFuncName) {
 
   auto F = getOrCreateFunction(M, RetTy, getTypes(Args),
@@ -727,7 +727,7 @@ addCallInst(Module *M, StringRef FuncName, Type *RetTy, ArrayRef<Value *> Args,
 
 CallInst *
 addCallInstSPIRV(Module *M, StringRef FuncName, Type *RetTy, ArrayRef<Value *> Args,
-    AttributeSet *Attrs, Instruction *Pos, StringRef InstName) {
+    AttributeList *Attrs, Instruction *Pos, StringRef InstName) {
   BuiltinFuncMangleInfo BtnInfo;
   return addCallInst(M, FuncName, RetTy, Args, Attrs, Pos, &BtnInfo,
       InstName);
@@ -898,7 +898,7 @@ getNamedMDAsStringSet(Module *M, const std::string &MDName) {
   NamedMDNode *NamedMD = M->getNamedMetadata(MDName);
   std::set<std::string> StrSet;
   if (!NamedMD)
-    return std::move(StrSet);
+    return StrSet;
 
   assert(NamedMD->getNumOperands() > 0 && "Invalid SPIR");
 
@@ -907,10 +907,10 @@ getNamedMDAsStringSet(Module *M, const std::string &MDName) {
     if (!MD || MD->getNumOperands() == 0)
       continue;
     for (unsigned J = 0, N = MD->getNumOperands(); J != N; ++J)
-      StrSet.insert(std::move(getMDOperandAsString(MD, J)));
+      StrSet.insert(getMDOperandAsString(MD, J));
   }
 
-  return std::move(StrSet);
+  return StrSet;
 }
 
 std::tuple<unsigned, unsigned, std::string>
@@ -1145,7 +1145,7 @@ getScalarOrArrayConstantInt(Instruction *Pos, Type *T, unsigned Len, uint64_t V,
     auto AT = ArrayType::get(ET, Len);
     std::vector<Constant *> EV(Len, ConstantInt::get(ET, V, isSigned));
     auto CA = ConstantArray::get(AT, EV);
-    auto Alloca = new AllocaInst(AT, "", Pos);
+    auto Alloca = new AllocaInst(AT, 0,"", Pos);
     new StoreInst(CA, Alloca, Pos);
     auto Zero = ConstantInt::getNullValue(Type::getInt32Ty(T->getContext()));
     Value *Index[] = {Zero, Zero};

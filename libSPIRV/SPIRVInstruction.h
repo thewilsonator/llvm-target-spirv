@@ -979,6 +979,7 @@ protected:
     assert(conTy->isTypeBool() && "Invalid type");
     assert(getType() == getValueType(Op1) && getType() == getValueType(Op2) &&
         "Inconsistent type");
+    (void)conTy; // Supress warning spam
   }
   SPIRVId Condition;
   SPIRVId Op1;
@@ -1065,6 +1066,9 @@ protected:
       assert((Type->isTypeVector() ? (Type->getVectorComponentCount() ==
           getValueType(Op)->getVectorComponentCount()): 1) &&
           "Invalid vector component Width for Generic Negate instruction");
+    (void)resTy; // Supress warning spam
+    (void)opTy; // Supress warning spam
+
     }
   }
 };
@@ -1596,6 +1600,7 @@ protected:
     size_t CompCount = Type->getVectorComponentCount();
     assert(Components.size() == CompCount);
     assert(Components.size() > 1);
+    (void)CompCount; // Supress warning spam
   }
   SPIRVId Vector1;
   SPIRVId Vector2;
