@@ -1,3 +1,13 @@
+//===-- Instructions.td - SPIRV Core Instructions ----------*- tablegen -*-===//
+//
+//                     The LLVM Compiler Infrastructure
+//
+// This file is distributed under the University of Illinois Open Source
+// License. See LICENSE.TXT for details.
+//
+//===----------------------------------------------------------------------===//
+// File contains section 3.32 of the SPIRV Spec
+//===----------------------------------------------------------------------===//
 
 
 class InstructionSet<bits<2> val,int version> {

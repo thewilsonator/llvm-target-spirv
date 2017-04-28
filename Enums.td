@@ -1,5 +1,13 @@
+//===-- Enums.td - SPIRV Enums -----------------------------*- tablegen -*-===//
+//
+//                     The LLVM Compiler Infrastructure
+//
+// This file is distributed under the University of Illinois Open Source
+// License. See LICENSE.TXT for details.
+//
+//===----------------------------------------------------------------------===//
 // File contains section 3.2-3.31 of the SPIRV Spec
-
+//===----------------------------------------------------------------------===//
 class SPIRVEnum {
   bits<32> Op = op;
   int Section; // == section from the spec 3.# 1-31, nonsemantic variable
