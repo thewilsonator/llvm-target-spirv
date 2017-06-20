@@ -36,8 +36,7 @@ bool SPIRVTargetMachine::addPassesToEmitFile(PassManagerBase &PM,
                                               raw_pwrite_stream &Out, CodeGenFileType FileType,
                          bool DisableVerify, AnalysisID StartBefore ,
                          AnalysisID StartAfter, AnalysisID StopBefore,
-                         AnalysisID StopAfter,
-                         MachineFunctionInitializer *MFInitializer)
+                         AnalysisID StopAfter)
 {
     PM.add(createSPIRVWriterPass(Out));
     return false;

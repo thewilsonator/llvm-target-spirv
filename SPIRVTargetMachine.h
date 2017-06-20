@@ -39,8 +39,7 @@ public:
   bool addPassesToEmitFile(PassManagerBase &PM, raw_pwrite_stream &Out, CodeGenFileType FileType,
                            bool DisableVerify = true, AnalysisID StartBefore = nullptr,
                            AnalysisID StartAfter = nullptr, AnalysisID StopBefore = nullptr,
-                           AnalysisID StopAfter = nullptr,
-                           MachineFunctionInitializer *MFInitializer = nullptr) override;
+                           AnalysisID StopAfter = nullptr) override;
 };
 
 class SPIRV32TargetMachine : public SPIRVTargetMachine {
@@ -51,7 +50,7 @@ public:
                          CodeModel::Model CM, CodeGenOpt::Level OL);
 };
 
-/// Sparc 64-bit target machine
+/// SPIRV 64-bit target machine
 ///
 class SPIRV64TargetMachine : public SPIRVTargetMachine {
 
