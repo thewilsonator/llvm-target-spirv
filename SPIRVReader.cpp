@@ -45,7 +45,7 @@
 #include "libSPIRV/SPIRVInstruction.h"
 #include "libSPIRV/SPIRVExtInst.h"
 #include "SPIRVInternal.h"
-#include "SPIRVMDBuilder.h"
+#include "libSPIRV/SPIRVMDBuilder.h"
 #include "OCLUtil.h"
 
 #include "llvm/ADT/DenseMap.h"

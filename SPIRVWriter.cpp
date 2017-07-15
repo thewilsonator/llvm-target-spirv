@@ -49,8 +49,8 @@
 #include "libSPIRV/SPIRVExtInst.h"
 #include "libSPIRV/SPIRVUtil.h"
 #include "SPIRVInternal.h"
-#include "SPIRVMDWalker.h"
-#include "OCLTypeToSPIRV.h"
+#include "libSPIRV/SPIRVMDWalker.h"
+#include "Passes/OCLTypeToSPIRV.h"
 #include "OCLUtil.h"
 
 #include "llvm/ADT/DenseMap.h"
