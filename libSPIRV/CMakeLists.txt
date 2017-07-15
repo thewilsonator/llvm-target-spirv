@@ -1,4 +1,5 @@
 add_definitions(-D_SPIRV_LLVM_API)
+include_directories(..)
 add_llvm_library(LLVMSPIRVlibSPIRV
   SPIRVBasicBlock.cpp
   SPIRVDebug.cpp
@@ -9,5 +10,6 @@ add_llvm_library(LLVMSPIRVlibSPIRV
   SPIRVModule.cpp
   SPIRVStream.cpp
   SPIRVType.cpp
+  SPIRVUtil.cpp
   SPIRVValue.cpp
  )
