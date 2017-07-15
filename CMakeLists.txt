@@ -10,36 +10,22 @@ add_subdirectory(MCTargetDesc)
 #endif()
 
 add_llvm_target(SPIRVCodeGen
-#  libSPIRV/SPIRVBasicBlock.cpp
-#  libSPIRV/SPIRVDebug.cpp
-#  libSPIRV/SPIRVDecorate.cpp
-#  libSPIRV/SPIRVEntry.cpp
-#  libSPIRV/SPIRVFunction.cpp
-#  libSPIRV/SPIRVInstruction.cpp
-#  libSPIRV/SPIRVModule.cpp
-#  libSPIRV/SPIRVStream.cpp
-#  libSPIRV/SPIRVType.cpp
-#  libSPIRV/SPIRVValue.cpp
-#  Mangler/FunctionDescriptor.cpp
-#  Mangler/Mangler.cpp
-#  Mangler/ManglingUtils.cpp
-#  Mangler/ParameterType.cpp
-  OCL20To12.cpp
-  OCL20ToSPIRV.cpp
-  OCL21ToSPIRV.cpp
-  OCLTypeToSPIRV.cpp
+  Passes/OCL20To12.cpp
+  Passes/OCL20ToSPIRV.cpp
+  Passes/OCL21ToSPIRV.cpp
+  Passes/OCLTypeToSPIRV.cpp
+  Passes/SPIRVLowerBool.cpp
+  Passes/SPIRVLowerConstExpr.cpp
+  Passes/SPIRVLowerOCLBlocks.cpp
+  Passes/SPIRVRegularizeLLVM.cpp
+  Passes/SPIRVToOCL20.cpp
+  Passes/TransOCLMD.cpp
   OCLUtil.cpp
-  SPIRVLowerBool.cpp
-  SPIRVLowerConstExpr.cpp
-  SPIRVLowerOCLBlocks.cpp
   SPIRVReader.cpp
-  SPIRVRegularizeLLVM.cpp
   SPIRVTargetMachine.cpp
-  SPIRVToOCL20.cpp
-  SPIRVUtil.cpp
   SPIRVWriter.cpp
   SPIRVWriterPass.cpp
-  TransOCLMD.cpp
+
   )
 
 #add_dependencies(Spirv intrinsics_gen)
