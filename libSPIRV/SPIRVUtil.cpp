@@ -38,9 +38,9 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#include "SPIRVInternal.h"
-#include "libSPIRV/SPIRVDecorate.h"
-#include "libSPIRV/SPIRVValue.h"
+#include "../SPIRVInternal.h"
+#include "SPIRVDecorate.h"
+#include "SPIRVValue.h"
 #include "SPIRVMDWalker.h"
 #include "OCLUtil.h"
 
