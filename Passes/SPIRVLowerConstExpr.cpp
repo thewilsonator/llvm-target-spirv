@@ -32,15 +32,15 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file implements regularization of LLVM moduel for SPIR-V.
+// This file implements regularization of LLVM module for SPIR-V.
 //
 //===----------------------------------------------------------------------===//
 #define DEBUG_TYPE "spv-lower-const-expr"
 
 #include "SPIRVInternal.h"
 #include "OCLUtil.h"
-#include "SPIRVMDBuilder.h"
-#include "SPIRVMDWalker.h"
+#include "libSPIRV/SPIRVMDBuilder.h"
+#include "libSPIRV/SPIRVMDWalker.h"
 
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/ADT/Triple.h"
@@ -63,8 +63,8 @@ using namespace OCLUtil;
 
 namespace SPIRV {
 
-cl::opt<bool> SPIRVLowerConst("spirv-lower-const-expr", cl::init(true),
-    cl::desc("LLVM/SPIR-V translation enalbe lowering constant expression"));
+cl::opt<bool> SPIRVLowerConst(DEBUG_TYPE, cl::init(true),
+    cl::desc("LLVM/SPIR-V translation enable lowering constant expression"));
 
 class SPIRVLowerConstExpr: public ModulePass {
 public:
@@ -156,8 +156,7 @@ SPIRVLowerConstExpr::visit(Module *M) {
 
 }
 
-INITIALIZE_PASS(SPIRVLowerConstExpr, "spv-lower-const-expr",
-    "Regularize LLVM for SPIR-V", false, false)
+INITIALIZE_PASS(SPIRVLowerConstExpr, DEBUG_TYPE, "Regularize LLVM for SPIR-V", false, false)
 
 ModulePass *llvm::createSPIRVLowerConstExpr() {
   return new SPIRVLowerConstExpr();

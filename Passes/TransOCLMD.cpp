@@ -39,8 +39,8 @@
 
 #include "SPIRVInternal.h"
 #include "OCLUtil.h"
-#include "SPIRVMDBuilder.h"
-#include "SPIRVMDWalker.h"
+#include "libSPIRV/SPIRVMDBuilder.h"
+#include "libSPIRV/SPIRVMDWalker.h"
 
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/ADT/Triple.h"
