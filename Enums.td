@@ -13,6 +13,7 @@ class SPIRVEnum {
   int Section; // == section from the spec 3.# 1-31, nonsemantic variable
   list<Operand> FollowedLiterals = [];
   bit isMask = 0;
+  bit isID = 0;
 }
 
 // Capabilities
@@ -95,8 +96,6 @@ class InstructionSet<string name>  : StringOperand {
 
 def iset_OpenCL  : InstructionSet<"OpenCL.std.100">;
 def iset_GLSL450 : InstructionSet<"GLSL.std.450";
-
-include "OpenCl.td"
 
 class ExecutionModel<int op,Capability cap> : SPIRVEnum  {
   let Op = op;
@@ -217,7 +216,7 @@ def exmode_OutputVertices        :  ExecutionModel<26,[cap_Geometry,cap_Tessella
 def exmode_OutputPoints          :  ExecutionModel<27,[cap_Geometry],[exmdl_Geometry]>;
 def exmode_OutputLineStrip       :  ExecutionModel<28,[cap_Geometry],[exmdl_Geometry]>;
 def exmode_OutputTriangleStrip   :  ExecutionModel<29,[cap_Geometry],[exmdl_Geometry]>;
-def exmode_VecTypeHint           :  ExecutionModel<30,[cap_Kernel],[exmdl_Kernel],1>;
+def exmode_VecTypeHint           :  ExecutionModel<30,[cap_Kernel],[exmdl_Kernel],[IntOperand]>;
                                     // high 16 = vecwidth, lo = type, see spec for details
 
 def exmode_ContractionOff        :  ExecutionModel<31,[cap_Kernel],[exmdl_Kernel]>;
@@ -645,19 +644,19 @@ class MemorySemantics<int op,list<Capability> cap = []]> :  SPIRVEnum {
   list<Capability> Cap = cap;
 }
 
-def ms_None : FunctionControl<0>; // Relaxed
+def ms_None : MemorySemantics<0>; // Relaxed
 // There is no #1
-def ms_Acquire : FunctionControl<2>;
-def ms_Release : FunctionControl<4>;
-def ms_AcquireRelease : FunctionControl<8>;
-def ms_SequentiallyConsistent : FunctionControl<16>;
+def ms_Acquire : MemorySemantics<2>;
+def ms_Release : MemorySemantics<4>;
+def ms_AcquireRelease : MemorySemantics<8>;
+def ms_SequentiallyConsistent : MemorySemantics<16>;
 // There is no #32 (0x20)
-def ms_UniformMemory : FunctionControl<64, [cap_Shader]>;
-def ms_SubgroupMemory : FunctionControl<128>;
-def ms_WorkgroupMemory : FunctionControl<256>;
-def ms_CrossWorkgroupMemory : FunctionControl<512>;
-def ms_AtomicCounterMemory : FunctionControl<1024,[cap_AtomicStorage]>;
-def ms_ImageMemory : FunctionControl<2048>;
+def ms_UniformMemory : MemorySemantics<64, [cap_Shader]>;
+def ms_SubgroupMemory : MemorySemantics<128>;
+def ms_WorkgroupMemory : MemorySemantics<256>;
+def ms_CrossWorkgroupMemory : MemorySemantics<512>;
+def ms_AtomicCounterMemory : MemorySemantics<1024,[cap_AtomicStorage]>;
+def ms_ImageMemory : MemorySemantics<2048>;
 
 // Section 3.26 Memory Access
 class MemoryAccess<int op, list<Operands> followedBy = []> :  SPIRVEnum {
@@ -676,7 +675,7 @@ def ma_Nontemporal : MemoryAccess<4>;
 class Scope<int op> :  SPIRVEnum {
   let Op = op;
   let isID = 1;
-  let Section= = 27;
+  let Section = 27;
 }
 
 def scope_CrossDevice   : Scope<0>;
@@ -719,12 +718,11 @@ let isMask = 1;
 }
 
 def kpi_None : KernelProfilingInfo<0>;
-def kpi_CmdExecTime : KernelProfilingInfo<0>;
+def kpi_CmdExecTime : KernelProfilingInfo<1>;
 
 // Section 3.31 is at the top of this file.
 
-// Section 3.32 - Instructions
-include "Instructions.td"
+// Section 3.32 - Instructions - see Instructions.td
 
 
 

@@ -22,13 +22,13 @@ class SPIRVInstruction< bits<32> base_word_count, bits<32> op, bits<24> resIdx,
                         list<Operand> operands, list<Capability> cap = [], bit variable = 0> {
   bits<32> BaseWordCount = base_word_count;
   bits<32> Op = op;
-
+  bits<32> Op2 = 0; // Opcode of Extension instruction if applicable
   // which index, 1 based, (if any) of 'Operands' is a new id returned by this instruction?
   bits<23> ResultIdIndex = resIdx;
   bit      BBTerminator = 0;
   // Subsection of 3.32 of the spec that this instruction belongs to
   // useful for splicing out debug instructions?
-  bits<5> InstClass;// 23 subsections of 3.32
+  bits<5> InstClass;// 23 subsections of 3.32 for SPIRV Core / Subsections of section 2 OpenCL
   bit VariableLength = variable; // anything with oper_ImmString is automatically
   // is this an instruction from a Set other then core? e.g. OpenCL.std.100
   InstructionSet = instset_Core;
@@ -70,6 +70,10 @@ class InstSintArithExt<bits<32> op>: SPIRVInstruction<5,op,2,[oper_SintArithExtT
 class InstAtomIntBinary<bits<32> op> : SPIRVInstruction<7,op,2,[oper_IntScalarType,oper_IntPointerVar,
                                                                 oper_Scope,
                                                                 oper_MemorySemantics,oper_IntVar]>;
+// Unary
+class InstFPUnary<bits<32> op> : SPIRVInstruction<4,op,2,[oper_FloatVecScalType,oper_FloatVecScalVar,
+                                                          oper_FloatVecScalVar]>;
+
 // Atomic unary
 class InstAtomIntUnary<bits<32> op> : SPIRVInstruction<6,op,2,[oper_IntScalarType,oper_IntPointerType,
                                                                oper_Scope,
@@ -389,8 +393,7 @@ let InstClass = 13 in {
   def inst_OpSNegate: SPIRVInstruction<4,126,2,[oper_SintVecScalType,oper_SintVecScalVar,
                                                 oper_SintVecScalVar]>;
 
-  def inst_OpFNegate : SPIRVInstruction<4,127,2,[oper_FloatVecScalType,oper_FloatVecScalVar,
-                                                 oper_FloatVecScalVar]>;
+  def inst_OpFNegate : InstFPUnary<127>;
 // Binary
   def inst_OpIAdd : InstIntBinary <128>;
   def inst_OpFAdd : InstFPBinary  <129>;
