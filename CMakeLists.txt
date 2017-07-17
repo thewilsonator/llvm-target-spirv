@@ -4,10 +4,7 @@ add_subdirectory(Mangler)
 add_subdirectory(TargetInfo)
 add_subdirectory(MCTargetDesc)
 
-#option(SPIRV_USE_LLVM_API "Enable usage of LLVM API for libSPIRV." ON)
-#if ( SPIRV_USE_LLVM_API )
-  add_definitions(-D_SPIRV_LLVM_API)
-#endif()
+add_definitions(-D_SPIRV_LLVM_API)
 
 add_llvm_target(SPIRVCodeGen
   Passes/OCL20To12.cpp
