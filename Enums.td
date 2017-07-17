@@ -242,14 +242,14 @@ def stc_Input           : StorageClass<1,[]          ,-1,7>; // output of prev g
                                                              //r/o noinit like above.
 def stc_Uniform         : StorageClass<2,[cap_Shader],-1,5>; // Graphics uniform blocks and buffer blocks.
 def stc_Output          : StorageClass<3,[cap_Shader],-1,8>; // output of graphics stage
-def stc_Workgroup       : StorageClass<4,[]          ,2,2>;  // OpenCL __local (stack), GLSL stack
+def stc_Workgroup       : StorageClass<4,[]          ,2,2>;  // OpenCL __local , GLSL stack
 def stc_CrossWorkgroup  : StorageClass<5,[cap_Shader],1,1>;  // OpenCL __global
 def stc_Private         : StorageClass<6,[cap_Shader],-1,6>; // Shader gloabl memory?
-def stc_Function        : StorageClass<6,[],0,0>;            // OpenCL __private?
-def stc_Generic         : StorageClass<6,[cap_GenericPointer],-1,6>;
-def stc_PushConstant    : StorageClass<6,[cap_Shader],-1,6>;
-def stc_AtomicCounter   : StorageClass<6,[cap_Shader],-1,6>;
-def stc_Image           : StorageClass<6,[cap_Shader],1,6>; // OpenCL __global ?
+def stc_Function        : StorageClass<7,[],0,0>;            // OpenCL __private?
+def stc_Generic         : StorageClass<8,[cap_GenericPointer],4,6>;
+def stc_PushConstant    : StorageClass<9,[cap_Shader],-1,6>;
+def stc_AtomicCounter   : StorageClass<10,[cap_Shader],-1,6>;
+def stc_Image           : StorageClass<11,[cap_Shader],1,6>; // OpenCL __global ?
 
 // Section 3.8 - Dim - Dimensionality of an image
 class Dim<int op, list<Capability> cap>  : SPIRVEnum {

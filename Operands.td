@@ -173,7 +173,7 @@ multiclass TypeVar<bits<8> val> {
 // The meta type is a not valid type
 // i.e. no corresponding OpTypeFoo instructions
 // the "constructing" operation is OpFoo instead.
-multiclass Var<bits<5> val> {
+multiclass Var<bits<8> val> {
   def Var  : IdOperand { let type = val; let type_qual = 1; }
 }
 // There are no valid instances of this type e.g. void.
