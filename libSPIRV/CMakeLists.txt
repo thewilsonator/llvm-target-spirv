@@ -12,4 +12,5 @@ add_llvm_library(LLVMSPIRVlibSPIRV
   SPIRVType.cpp
   SPIRVUtil.cpp
   SPIRVValue.cpp
+  LINK_LIBS LLVMSPIRVMangler
  )
