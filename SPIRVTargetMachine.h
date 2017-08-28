@@ -33,13 +33,11 @@ public:
   SPIRVTargetMachine(const Target &T, StringRef DL, const Triple &TT,
                      StringRef CPU, StringRef FS, const TargetOptions &Options,
                      SPIRVTargetMachineType stmt, Reloc::Model RM,
-                     CodeModel::Model CM, CodeGenOpt::Level OL);
+                     CodeModel::Model CM, CodeGenOpt::Level OL, bool Jit);
   ~SPIRVTargetMachine() override;
 
-  bool addPassesToEmitFile(PassManagerBase &PM, raw_pwrite_stream &Out, CodeGenFileType FileType,
-                           bool DisableVerify = true, AnalysisID StartBefore = nullptr,
-                           AnalysisID StartAfter = nullptr, AnalysisID StopBefore = nullptr,
-                           AnalysisID StopAfter = nullptr) override;
+  virtual bool addPassesToEmitFile(PassManagerBase &PM, raw_pwrite_stream &Out, CodeGenFileType FileType,
+                           bool DisableVerify = true, MachineModuleInfo* MMI = nullptr) override;
 };
 
 class SPIRV32TargetMachine : public SPIRVTargetMachine {
@@ -47,7 +45,7 @@ class SPIRV32TargetMachine : public SPIRVTargetMachine {
 public:
     SPIRV32TargetMachine(const Target &T, const Triple &TT, StringRef CPU,
                          StringRef FS, const TargetOptions &Options, Optional<Reloc::Model> RM,
-                         CodeModel::Model CM, CodeGenOpt::Level OL);
+                         Optional<CodeModel::Model> CM, CodeGenOpt::Level OL, bool Jit);
 };
 
 /// SPIRV 64-bit target machine
@@ -57,7 +55,7 @@ class SPIRV64TargetMachine : public SPIRVTargetMachine {
 public:
     SPIRV64TargetMachine(const Target &T, const Triple &TT, StringRef CPU,
                          StringRef FS, const TargetOptions &Options, Optional<Reloc::Model> RM,
-                         CodeModel::Model CM, CodeGenOpt::Level OL);
+                         Optional<CodeModel::Model> CM, CodeGenOpt::Level OL, bool Jit);
 };
 
 class SPIRVLTargetMachine : public SPIRVTargetMachine {
@@ -66,7 +64,7 @@ class SPIRVLTargetMachine : public SPIRVTargetMachine {
 public:
     SPIRVLTargetMachine(const Target &T, const Triple &TT, StringRef CPU,
                         StringRef FS, const TargetOptions &Options, Optional<Reloc::Model> RM,
-                        CodeModel::Model CM, CodeGenOpt::Level OL);
+                        Optional<CodeModel::Model> CM, CodeGenOpt::Level OL, bool Jit);
 };
 
     

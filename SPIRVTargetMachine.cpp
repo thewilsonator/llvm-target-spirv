@@ -26,7 +26,8 @@ SPIRVTargetMachine::SPIRVTargetMachine(const Target &T, StringRef _DL,
                                        const TargetOptions &Options,
                                        SPIRVTargetMachineType stmt,
                                        Reloc::Model RM,
-                                       CodeModel::Model CM, CodeGenOpt::Level OL)
+                                       CodeModel::Model CM, CodeGenOpt::Level OL,
+                                       bool Jit)
     : LLVMTargetMachine(T, _DL, TT, CPU, FS, Options,RM,CM,OL), stmt(stmt) {
 }
 
@@ -34,9 +35,7 @@ SPIRVTargetMachine::~SPIRVTargetMachine() {}
 
 bool SPIRVTargetMachine::addPassesToEmitFile(PassManagerBase &PM,
                                               raw_pwrite_stream &Out, CodeGenFileType FileType,
-                         bool DisableVerify, AnalysisID StartBefore ,
-                         AnalysisID StartAfter, AnalysisID StopBefore,
-                         AnalysisID StopAfter)
+                         bool DisableVerify, MachineModuleInfo* MMI)
 {
     PM.add(createSPIRVWriterPass(Out));
     return false;
@@ -45,27 +44,33 @@ bool SPIRVTargetMachine::addPassesToEmitFile(PassManagerBase &PM,
 
 SPIRV32TargetMachine::SPIRV32TargetMachine(const Target &T, const Triple &TT,
                          StringRef CPU, StringRef FS,
-                        const TargetOptions &_Options, Optional<Reloc::Model> RM,
-                        CodeModel::Model CM, CodeGenOpt::Level OL)
+                         const TargetOptions &_Options, Optional<Reloc::Model> RM,
+                         Optional<CodeModel::Model> CM, CodeGenOpt::Level OL, bool Jit)
     : SPIRVTargetMachine(T,SPIR_DATALAYOUT32,TT,CPU,FS,_Options,STMT_OCL32,
-                         Reloc::Static,CM,OL) {}
+                         Reloc::Static,
+                         CM ? *CM : CodeModel::Medium,
+                         OL,false) {}
 
 
 SPIRV64TargetMachine::SPIRV64TargetMachine(const Target &T, const Triple &TT,
                          StringRef CPU, StringRef FS,
                         const TargetOptions &_Options,Optional<Reloc::Model> RM,
-                        CodeModel::Model CM, CodeGenOpt::Level OL)
+                        Optional<CodeModel::Model> CM, CodeGenOpt::Level OL, bool Jit)
     : SPIRVTargetMachine(T,SPIR_DATALAYOUT64,TT,CPU,FS,_Options,STMT_OCL64,
-                         Reloc::Static,CM,OL) {}
+                         Reloc::Static,
+                         CM ? *CM : CodeModel::Medium,
+                         OL, false) {}
     
 
 
 SPIRVLTargetMachine::SPIRVLTargetMachine(const Target &T, const Triple &TT,
                          StringRef CPU, StringRef FS,
                         const TargetOptions &_Options,Optional<Reloc::Model> RM,
-                        CodeModel::Model CM, CodeGenOpt::Level OL)
+                        Optional<CodeModel::Model> CM, CodeGenOpt::Level OL, bool Jit)
     // TODO: data layout
-: SPIRVTargetMachine(T,"",TT,CPU,FS,_Options,STMT_VK,Reloc::Static,CM,OL) {}
+: SPIRVTargetMachine(T,"",TT,CPU,FS,_Options,STMT_VK,Reloc::Static,
+                     CM ? *CM : CodeModel::Medium,
+                     OL, false) {}
 
 
 namespace llvm {
