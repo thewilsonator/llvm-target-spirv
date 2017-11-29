@@ -29,9 +29,9 @@ Target &getTheSPIRVLTarget() {
 
 extern "C" void LLVMInitializeSPIRVTargetInfo() {
   RegisterTarget<Triple::spir> X(getTheSPIRV32Target(), "spirv32",
-                                    "32-bit SPIR-V");
+                                    "32-bit SPIR-V", "SPIRV");
   RegisterTarget<Triple::spir64> Y(getTheSPIRV64Target(), "spirv64",
-                                    "64-bit SPIR-V");
+                                    "64-bit SPIR-V", "SPIRV");
   RegisterTarget<Triple::spirl> Z(getTheSPIRVLTarget(), "spirvlogical",
-                                     "SPIR-V Logical");
+                                     "SPIR-V Logical", "SPIRV");
 }
