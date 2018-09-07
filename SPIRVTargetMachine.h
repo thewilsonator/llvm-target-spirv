@@ -36,7 +36,8 @@ public:
                      CodeModel::Model CM, CodeGenOpt::Level OL, bool Jit);
   ~SPIRVTargetMachine() override;
 
-  virtual bool addPassesToEmitFile(PassManagerBase &PM, raw_pwrite_stream &Out, CodeGenFileType FileType,
+  virtual bool addPassesToEmitFile(PassManagerBase &PM, raw_pwrite_stream &Out,
+                                   raw_pwrite_stream *DwoOut, CodeGenFileType FileType,
                            bool DisableVerify = true, MachineModuleInfo* MMI = nullptr) override;
 };
 

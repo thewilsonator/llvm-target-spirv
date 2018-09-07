@@ -33,8 +33,8 @@ SPIRVTargetMachine::SPIRVTargetMachine(const Target &T, StringRef _DL,
 
 SPIRVTargetMachine::~SPIRVTargetMachine() {}
 
-bool SPIRVTargetMachine::addPassesToEmitFile(PassManagerBase &PM,
-                                              raw_pwrite_stream &Out, CodeGenFileType FileType,
+bool SPIRVTargetMachine::addPassesToEmitFile(PassManagerBase &PM, raw_pwrite_stream &Out,
+                                             raw_pwrite_stream *DwoOut, CodeGenFileType FileType,
                          bool DisableVerify, MachineModuleInfo* MMI)
 {
     PM.add(createSPIRVWriterPass(Out));
@@ -76,11 +76,11 @@ SPIRVLTargetMachine::SPIRVLTargetMachine(const Target &T, const Triple &TT,
 namespace llvm {
     Target &getTheSPIRV32Target();
     Target &getTheSPIRV64Target();
-    Target &getTheSPIRVLTarget();
+    //Target &getTheSPIRVLTarget();
 }
 extern "C" void LLVMInitializeSPIRVTarget() {
     // Register the target.
     RegisterTargetMachine<SPIRV32TargetMachine> X(getTheSPIRV32Target());
     RegisterTargetMachine<SPIRV64TargetMachine> Y(getTheSPIRV64Target());
-    RegisterTargetMachine<SPIRVLTargetMachine>  Z(getTheSPIRVLTarget());
+    //RegisterTargetMachine<SPIRVLTargetMachine>  Z(getTheSPIRVLTarget());
 }

@@ -20,11 +20,12 @@ Target &getTheSPIRV64Target() {
   static Target TheSPIRV64Target;
   return TheSPIRV64Target;
 }
-
+/*
 Target &getTheSPIRVLTarget() {
     static Target TheSPIRVLTarget;
     return TheSPIRVLTarget;
 }
+ */
 }
 
 extern "C" void LLVMInitializeSPIRVTargetInfo() {
@@ -32,6 +33,6 @@ extern "C" void LLVMInitializeSPIRVTargetInfo() {
                                     "32-bit SPIR-V", "SPIRV");
   RegisterTarget<Triple::spir64> Y(getTheSPIRV64Target(), "spirv64",
                                     "64-bit SPIR-V", "SPIRV");
-  RegisterTarget<Triple::spirl> Z(getTheSPIRVLTarget(), "spirvlogical",
-                                     "SPIR-V Logical", "SPIRV");
+  //RegisterTarget<Triple::spirl> Z(getTheSPIRVLTarget(), "spirvlogical",
+  //                                   "SPIR-V Logical", "SPIRV");
 }
