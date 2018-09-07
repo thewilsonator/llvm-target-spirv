@@ -56,7 +56,7 @@
 
 using namespace SPIRV;
 using namespace llvm;
-#define DEBUG(x...) do {} while(0)
+#define DEBUG(...) do {} while(0)
 namespace SPIRV{
 
   /// The LLVM/SPIR-V translator version used to fill the lower 16 bits of the
